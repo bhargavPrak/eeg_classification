@@ -16,15 +16,15 @@ from keras.models import load_model
 
 from keras.callbacks import ModelCheckpoint
 
-df1 = pd.read_csv(‘/MovementAAL/dataset/MovementAAL_RSS_1.csv')
-df2 = pd.read_csv('/MovementAAL/dataset/MovementAAL_RSS_2.csv')
+df1 = pd.read_csv(<path to the train data csv file>)
+df2 = pd.read_csv(<path to the train data csv file>)
 
 df1.head()
 df2.head()
 
 df1.shape, df2.shape
 
-path = 'MovementAAL/dataset/MovementAAL_RSS_'
+path = <path to the csv file>
 sequences = list()
 for i in range(1,315):
     file_path = path + str(i) + '.csv'
@@ -33,12 +33,12 @@ for i in range(1,315):
     values = df.values
     sequences.append(values)
 
-targets = pd.read_csv('MovementAAL/dataset/MovementAAL_target.csv')
+targets = pd.read_csv(<path to the test data csv file>)
 targets = targets.values[:,1]
 
 sequences[0]
 
-groups = pd.read_csv('MovementAAL/groups/MovementAAL_DatasetGroup.csv', header=0)
+groups = pd.read_csv(<path to known classes file>, header=0)
 groups = groups.values[:,1]
 
 len_sequences = []
@@ -84,6 +84,35 @@ validation_target = (validation_target+1)/2
 test_target = np.array(test_target)
 test_target = (test_target+1)/2
 
+#Logistic Regression model
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
+logreg = LogisticRegression()
+logreg.fit(train,train_target)
+predictins=logreg.predict(test)
+print("Accuracy:",metrics.accuracy_score(test_target, predictions))
+cnf_matrix = metrics.confusion_matrix(test_target, predictions)
+cnf_matrix
+
+#Random forest model
+from sklearn.ensemble import RandomForestRegressor
+rf = RandomForestRegressor(n_estimators = 1000, random_state = 42)
+rf.fit(train, train_target);
+predictions = rf.predict(test)
+print("Accuracy:",metrics.accuracy_score(test_target, predictions))
+cnf_matrix = metrics.confusion_matrix(test_target, predictions)
+cnf_matrix
+
+#Support vector machine model
+from sklearn import svm
+clf = svm.SVC(kernel='linear') # Linear Kernel
+clf.fit(train, train_target)
+predictions = clf.predict(test)
+print("Accuracy:",metrics.accuracy_score(test_target, predictions))
+cnf_matrix = metrics.confusion_matrix(test_target, predictions)
+cnf_matrix
+
+#RNN model
 model = Sequential()
 model.add(LSTM(256, input_shape=(seq_len, 4)))
 model.add(Dense(1, activation='sigmoid'))
@@ -96,7 +125,7 @@ model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
 model.fit(train, train_target, epochs=200, batch_size=128, callbacks=[chk], validation_data=(validation,validation_target))
 
 #loading the model and checking accuracy on the test data
-model = load_model('best_model.pkl')
+model = load_model(<path to best model>)
 
 from sklearn.metrics import accuracy_score
 test_preds = model.predict_classes(test)
