@@ -1,4 +1,7 @@
 # eeg_classification
+The supplementary material for the publication: A Novel Approach to Learning Models on EEG data Using
+Graph Theory features - A Comparative Study (doi:)
+
  This is the code dump used in studying different datasets with the help of 4 different classification models:
  - Logistic Regression
  - Random Forest Classifier
